@@ -6,6 +6,6 @@ const Joi = require('@hapi/joi');
 
 module.exports = Joi.object({
     id: Joi.string().min(1).max(Number.MAX_SAFE_INTEGER),
-    compound_index_a: Joi.string().required(),
-    compound_index_a: Joi.string().required(),
+    contacts: Joi.array().required(),
+    tenant: Joi.string().required(),
 });

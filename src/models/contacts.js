@@ -4,19 +4,23 @@
 
 const { model, Schema } = require('mongoose');
 
-const SampleSchema = new Schema({
+const ContactSchema = new Schema({
     id: {
         type: Number,
         required: true,
         default: 0,
         unique: true,
     },
-    compound_index_a: {
+    contacts: [
+        {
+            id: String,
+            date_of_birth: Date,
+            email: String,
+            name: String,
+        }
+    ],
+    tenant: {
         type: String,
-        required: true,
-    },
-    compound_index_b: {
-        type: Number,
         required: true,
     },
     //
@@ -47,9 +51,9 @@ const SampleSchema = new Schema({
     },
 });
 
-const Sample = module.exports = model('Sample', SampleSchema);
+const Contact = module.exports = model('Contact', ContactSchema);
 
 // /** Create Indexes */
-// Sample.ensureIndexes({ time_stamp: -1 }); // single descending
-// Sample.ensureIndexes({ id: 1 }, { unique: true }); // single unique
-// Sample.ensureIndexes({ compound_index_a: 1, compound_index_b: 1 }, { unique: true }); // compound unique
+// Contact.ensureIndexes({ time_stamp: -1 }); // single descending
+// Contact.ensureIndexes({ id: 1 }, { unique: true }); // single unique
+// Contact.ensureIndexes({ compound_index_a: 1, compound_index_b: 1 }, { unique: true }); // compound unique

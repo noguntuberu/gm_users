@@ -3,12 +3,11 @@
 **/
 const SuperController = require('./_super');
 
-class SampleController extends SuperController {
+class ContactController extends SuperController {
     constructor() {
         super();
 
-        /** */
-        this.model = this.get_model('Sample');
+        this.model = this.get_model('Contact');
     }
 
     async create_record(data) {
@@ -16,12 +15,12 @@ class SampleController extends SuperController {
             const record_to_create = new this.model({ ...data });
             const created_record = await record_to_create.save();
 
-            return this.jsonize({
-                ...created_record,
+            return {
+                ...this.jsonize(created_record),
                 id: await this.get_record_metadata(this.model, created_record._id, created_record.time_stamp),
-            })
+            }
         } catch (e) {
-            console.log(`[SampleController] create_record Error: ${e.message}`);
+            console.log(`[ContactController] create_record Error: ${e.message}`);
         }
     }
 
@@ -31,7 +30,7 @@ class SampleController extends SuperController {
                 .skip(skip).limit(limit).sort(sort_options);
             return this.jsonize([...result]);
         } catch (e) {
-            console.log(`[SampleController] read_records: ${e.message}`);
+            console.log(`[ContactController] read_records: ${e.message}`);
         }
     }
 
@@ -46,7 +45,7 @@ class SampleController extends SuperController {
 
             return this.jsonize(result);
         } catch (e) {
-            console.log(`[SampleController] update_records Error: ${e.message}`);
+            console.log(`[ContactController] update_records Error: ${e.message}`);
         }
     }
 
@@ -62,9 +61,9 @@ class SampleController extends SuperController {
 
             return this.jsonize(result);
         } catch (e) {
-            console.log(`[SampleController] delete_records Error: ${e.message}`);
+            console.log(`[ContactController] delete_records Error: ${e.message}`);
         }
     }
 }
 
-module.exports = new SampleController();
+module.exports = new ContactController();

@@ -11,15 +11,17 @@ const {
 } = require('../middlewares/http');
 
 /** Route Handlers */
-const sample_route_handler = require('./sample');
+const contact_route_handler = require('./contact');
+const tenant_route_handler = require('./tenant');
 
 /** Cross Origin Handling */
 router.use(setup_request);
-router.use('/samples', sample_route_handler);
+router.use('/contacts', contact_route_handler);
+router.use('/tenants', tenant_route_handler);
 router.use(process_response);
 
 /** Static Routes */
-router.use('/files/image/:image_name', (request, response) => {
+router.use('/image/:image_name', (request, response) => {
 
 });
 
