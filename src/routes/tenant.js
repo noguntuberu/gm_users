@@ -6,10 +6,6 @@ const router = require('express').Router();
 const tenant_service = require('../services/tenant/tenant');
 
 router
-    .post('/', async (request, response, next) => {
-        request.payload = await tenant_service.create_record(request, next);
-        next();
-    })
     .get('/', async (request, response, next) => {
         request.payload = await tenant_service.read_records_by_filter(request, next);
         next();

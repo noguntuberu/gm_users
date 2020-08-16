@@ -4,25 +4,22 @@
 
 const { model, Schema } = require('mongoose');
 
-const ContactSchema = new Schema({
+const AccountRecoverySchema = new Schema({
     id: {
         type: Number,
         required: true,
         default: 0,
         unique: true,
     },
-    contacts: [
-        {
-            id: String,
-            date_of_birth: Date,
-            email: String,
-            name: String,
-        }
-    ],
     tenant_id: {
         type: String,
         required: true,
     },
+    expires_at: {
+        type: String,
+        required: true,
+    },
+
     //
     is_active: {
         type: Boolean,
@@ -51,9 +48,9 @@ const ContactSchema = new Schema({
     },
 });
 
-const Contact = module.exports = model('Contact', ContactSchema);
+const AccountRecovery = module.exports = model('AccountRecovery', AccountRecoverySchema);
 
 // /** Create Indexes */
-// Contact.ensureIndexes({ time_stamp: -1 }); // single descending
-// Contact.ensureIndexes({ id: 1 }, { unique: true }); // single unique
-// Contact.ensureIndexes({ compound_index_a: 1, compound_index_b: 1 }, { unique: true }); // compound unique
+// AccountRecovery.ensureIndexes({ time_stamp: -1 }); // single descending
+// AccountRecovery.ensureIndexes({ id: 1 }, { unique: true }); // single unique
+// AccountRecovery.ensureIndexes({ compound_index_a: 1, compound_index_b: 1 }, { unique: true }); // compound unique

@@ -6,10 +6,9 @@ const { logger } = require('../utilities/logger');
 module.exports = {
     handle_404(request, response, next) {
         const return_data = {
-            status_code: 404,
-            success: false,
             error: `Resource not found`,
-            payload: null
+            payload: null,
+            status_code: 404,
         };
 
         next(return_data);
@@ -22,7 +21,6 @@ module.exports = {
 
         // return error
         return response.status(error.status_code || 500).json({
-            success: false,
             status_code: error.status_code,
             error: error.error || `Internal Server Error`,
             payload: null

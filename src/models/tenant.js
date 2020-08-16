@@ -41,6 +41,10 @@ const TenantSchema = new Schema({
         type: String,
         required: false,
     },
+    password: {
+        type: String,
+        required: true,
+    },
     phone_number : {
         type: String,
         required: false,
@@ -49,7 +53,7 @@ const TenantSchema = new Schema({
     is_active: {
         type: Boolean,
         required: true,
-        default: true,
+        default: false,
     },
     is_deleted: {
         type: Boolean,

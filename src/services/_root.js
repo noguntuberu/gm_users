@@ -7,6 +7,24 @@ const { build_query } = require('../utilities/query');
 class RootService {
     constructor() { }
 
+    validate_email(raw_email) {
+        const email = raw_email.trim();
+        if (email.length < 6) {
+            return {
+                is_valid: false,
+                message: `Email address is too short.`,
+            }
+        }
+
+        const email_pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        const is_valid = email_pattern.test(email);
+
+        return {
+            is_valid,
+            message: is_valid ? email : `Invalid email address.`
+        }
+    }
+
     async handle_database_read(Controller, query_options, extra_options = {}) {
         const {
             count,
@@ -63,7 +81,6 @@ class RootService {
             error: message,
             payload: null,
             status_code: code,
-            success: false,
         }
     }
 
@@ -72,7 +89,6 @@ class RootService {
             payload,
             error: null,
             status_code: code,
-            success: true,
         }
     }
 }
