@@ -22,7 +22,7 @@ exports.build_query = options => {
     delete options.sort_by;
 
     Object.keys(options).forEach((field) => {
-        const field_value = options[field].toLowerCase();
+        const field_value = options[field];
         let condition;
 
         if (field_value.includes(':')) {

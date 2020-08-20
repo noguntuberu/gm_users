@@ -35,6 +35,7 @@ const TenantSchema = new Schema({
     },
     gender: {
         type: String,
+        enum: ['m', 'f', 'o'],
         required: false,
     },
     lastname : {
