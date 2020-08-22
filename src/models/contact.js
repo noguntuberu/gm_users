@@ -11,16 +11,31 @@ const ContactSchema = new Schema({
         default: 0,
         unique: true,
     },
-    contacts: [
-        {
-            id: String,
-            date_of_birth: Date,
-            email: String,
-            name: String,
-        }
-    ],
-    tenant_id: {
+    address: {
+        city: String,
+        country: String,
+        state:  String,
+        street: String,
+        zip: Number,
+    },
+    date_of_birth: {
+        type: Date,
+        required: false,
+    },
+    email: {
         type: String,
+        required: true,
+    },
+    firstname: {
+        type: String,
+        required: false,
+    },
+    lastname: {
+        type: String,
+        required: false,
+    },
+    tenant_id: {
+        type: Number,
         required: true,
     },
     //

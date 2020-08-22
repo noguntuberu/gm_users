@@ -4,8 +4,18 @@
 
 const Joi = require('@hapi/joi');
 
-module.exports = Joi.object({
+module.exports.SingleContactSchema = Joi.object({
+    address: Joi.object({
+        city: Joi.string(),
+        country: Joi.string(),
+        state: Joi.string(),
+        street: Joi.string(),
+        zip: Joi.string(),
+    }),
+    date_of_birth: Joi.string(),
+    email: Joi.string().email().required(),
+    firstname: Joi.string(),
     id: Joi.string().min(1).max(Number.MAX_SAFE_INTEGER),
-    contacts: Joi.array().required(),
-    tenant_id: Joi.string().required(),
+    lastname: Joi.string(),
+    tenant_id: Joi.number().required(),
 });

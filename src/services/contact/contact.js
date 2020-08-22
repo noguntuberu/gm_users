@@ -3,10 +3,10 @@
 **/
 //
 const RootService = require('../_root');
-const Observabble = require('../../utilities/observable');
+const Observable = require('../../utilities/observable');
 const ContactController = require('../../controllers/contact');
-const ContactSchema = require('../../schemas/contact');
-
+const { SingleContactSchema } = require('../../schemas/contact');
+const { ContactCreator, FileReader } = require('../../utilities/streams');
 const {
     build_query,
     build_wildcard_options
@@ -26,10 +26,11 @@ class ContactService extends RootService {
     async create_record(request, next) {
         try {
             const { body } = request;
-            const { error } = ContactSchema.validate(body);
+            const { error } = SingleContactSchema.validate(body);
 
             if (error) throw new Error(error);
 
+            delete body.id;
             const result = await this.contact_controller.create_record({ ...body });
             return this.process_single_read(result);
         } catch (e) {
@@ -38,14 +39,40 @@ class ContactService extends RootService {
         }
     }
 
+    async create_records_from_file(request, response, next) {
+        try {
+            const { files, body } = request;
+            const limits = {
+                size: 5 * 1024 *1024,
+                type: ['text/csv'],
+            };
+
+            if (!files) return this.process_failed_response(`No file attached.`);
+
+            const { contacts } = files;
+            const { tenant_id } = body;
+            if (!contacts) return this.process_failed_response(`Invalid file`);
+
+            const { data, size, mimetype } = contacts;
+            if (size > limits.size) return this.process_failed_response('File too large');
+            if (!limits.type.includes(mimetype)) return this.process_failed_response(`Invalid file type`);
+
+            const file_stream = new FileReader(data);
+            const contact_uploader = new ContactCreator(this.contact_controller, tenant_id);
+            file_stream.pipe(contact_uploader).pipe(response);
+        } catch (e) {
+            const err = this.process_failed_response(`[ContactService] created_record: ${e.message}`, 500);
+            next(err);
+        }
+    }
+
     async read_record_by_id(request, next) {
         try {
-            Observabble.emit('new', { name: 'new' });
             const { id } = request.params;
             if (!id) return next(this.process_failed_response(`Invalid ID supplied.`));
 
-            const result = await this.contact_controller.read_records({ id });
-            return this.process_single_read(result);
+            const result = await this.contact_controller.read_records({ id, is_active: true });
+            return this.process_single_read(result[0]);
         } catch (e) {
             const err = this.process_failed_response(`[ContactService] update_record_by_id: ${e.message}`, 500);
             return next(err);

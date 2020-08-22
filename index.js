@@ -20,6 +20,7 @@ const body_parser = require('body-parser');
 const compression = require('compression');
 const cors = require('cors');
 const express = require('express');
+const file_upload = require('express-fileupload');
 const helmet = require('helmet');
 const { morgan } = require('./src/utilities/logger');
 
@@ -33,7 +34,8 @@ app.use(compression());
 app.use(helmet());
 app.use(body_parser.json({ limit: '10mb' }));
 app.use(body_parser.urlencoded({ limit: '10mb', extended: true }));
-app.use(morgan)
+app.use(file_upload());
+app.use(morgan);
 
 /** Route Middleware */
 app.use('/', route_handler);
