@@ -4,40 +4,31 @@
 
 const { model, Schema } = require('mongoose');
 
-const ContactSchema = new Schema({
+const MailingListSchema = new Schema({
     id: {
         type: Number,
         required: true,
         default: 0,
     },
-    address: {
-        city: String,
-        country: String,
-        state:  String,
-        street: String,
-        zip: Number,
+    contacts: {
+        type: Array,
+        required: true,
+        default: [],
     },
-    date_of_birth: {
-        type: Date,
+    description : {
+        type: String,
         required: false,
     },
-    email: {
+    name : {
         type: String,
         required: true,
     },
-    firstname: {
-        type: String,
-        required: false,
-    },
-    lastname: {
-        type: String,
-        required: false,
-    },
-    tenant_id: {
+    tenant_id : {
         type: Number,
         required: true,
     },
-    //
+
+    // metadata
     is_active: {
         type: Boolean,
         required: true,
@@ -65,9 +56,9 @@ const ContactSchema = new Schema({
     },
 });
 
-const Contact = module.exports = model('Contact', ContactSchema);
+const MailingList = module.exports = model('MailingList', MailingListSchema);
 
 // /** Create Indexes */
-// Contact.ensureIndexes({ time_stamp: -1 }); // single descending
-// Contact.ensureIndexes({ id: 1 }, { unique: true }); // single unique
-// Contact.ensureIndexes({ compound_index_a: 1, compound_index_b: 1 }, { unique: true }); // compound unique
+// MailingList.ensureIndexes({ time_stamp: -1 }); // single descending
+// MailingList.ensureIndexes({ id: 1 }, { unique: true }); // single unique
+// MailingList.ensureIndexes({ compound_index_a: 1, compound_index_b: 1 }, { unique: true }); // compound unique

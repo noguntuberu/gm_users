@@ -9,7 +9,6 @@ const AccountRecoverySchema = new Schema({
         type: Number,
         required: true,
         default: 0,
-        unique: true,
     },
     tenant_id: {
         type: String,

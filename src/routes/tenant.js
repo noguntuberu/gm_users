@@ -5,7 +5,9 @@
 const router = require('express').Router();
 const tenant_service = require('../services/tenant/tenant');
 
-router
+try {
+
+    router
     .get('/', async (request, response, next) => {
         request.payload = await tenant_service.read_records_by_filter(request, next);
         next();
@@ -34,5 +36,9 @@ router
         request.payload = await tenant_service.delete_records(request, next);
         next();
     })
-
-module.exports = router;
+    
+} catch (e) {
+    console.log(`[Route Error] /tenants: ${e.message}`);
+} finally {
+    module.exports = router;
+}

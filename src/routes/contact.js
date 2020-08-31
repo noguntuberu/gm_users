@@ -5,7 +5,8 @@
 const router = require('express').Router();
 const contact_service = require('../services/contact/contact');
 
-router
+try {
+    router
     .post('/batch', async (request, response, next) => {
         await contact_service.create_records_from_file(request, response, next);
     })
@@ -41,5 +42,9 @@ router
         request.payload = await contact_service.delete_records(request, next);
         next();
     })
-
-module.exports = router;
+    
+} catch (e) {
+    console.log(`[Route Error] /contacts: ${e.message}`);
+} finally {
+    module.exports = router;
+}

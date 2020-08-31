@@ -22,17 +22,21 @@ exports.build_query = options => {
     delete options.sort_by;
 
     Object.keys(options).forEach((field) => {
-        const field_value = options[field];
+        const field_value = typeof(options[field]) == "number" ? options[field].toString(): options[field];
         let condition;
 
-        if (field_value.includes(':')) {
-            condition = this.build_in_query(field_value);
-        } else if (field_value.includes('!')) {
-            condition = this.build_nor_query(field_value);
-        } else if (field_value.includes('~')) {
-            condition = this.build_range_query(field_value);
+        if (typeof field_value == "string") {
+            if (field_value.includes(':')) {
+                condition = this.build_in_query(field_value);
+            } else if (field_value.includes('!')) {
+                condition = this.build_nor_query(field_value);
+            } else if (field_value.includes('~')) {
+                condition = this.build_range_query(field_value);
+            } else {
+                condition = this.build_or_query(field_value);
+            }
         } else {
-            condition = this.build_or_query(field_value);
+            condition = field_value;
         }
 
         seek_conditions[field] = { ...condition };

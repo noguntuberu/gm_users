@@ -19,6 +19,7 @@ class RootService {
         //
         return { ...record_to_mutate };
     }
+    
     async handle_database_read(Controller, query_options, extra_options = {}) {
         const {
             count,

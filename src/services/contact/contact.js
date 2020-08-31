@@ -5,8 +5,9 @@
 const RootService = require('../_root');
 const Observable = require('../../utilities/observable');
 const ContactController = require('../../controllers/contact');
+const MailingListController = require('../../controllers/mailing-list');
 const { SingleContactSchema } = require('../../schemas/contact');
-const { ContactCreator, FileReader } = require('../../utilities/streams');
+const { ContactCreator, FileReader, MailingListStream } = require('../../utilities/streams');
 const {
     build_query,
     build_wildcard_options
@@ -14,13 +15,15 @@ const {
 
 class ContactService extends RootService {
     constructor(
-        contact_controller
+        contact_controller,
+        mailing_list_controller,
     ) {
         /** */
         super();
 
         /** */
         this.contact_controller = contact_controller;
+        this.mailing_list_controller = mailing_list_controller;
     }
 
     async create_record(request, next) {
@@ -43,14 +46,14 @@ class ContactService extends RootService {
         try {
             const { files, body } = request;
             const limits = {
-                size: 5 * 1024 *1024,
+                size: 5 * 1024 * 1024,
                 type: ['text/csv'],
             };
 
             if (!files) return this.process_failed_response(`No file attached.`);
 
             const { contacts } = files;
-            const { tenant_id } = body;
+            const { tenant_id, list_id } = body;
             if (!contacts) return this.process_failed_response(`Invalid file`);
 
             const { data, size, mimetype } = contacts;
@@ -58,8 +61,14 @@ class ContactService extends RootService {
             if (!limits.type.includes(mimetype)) return this.process_failed_response(`Invalid file type`);
 
             const file_stream = new FileReader(data);
-            const contact_uploader = new ContactCreator(this.contact_controller, tenant_id);
-            file_stream.pipe(contact_uploader).pipe(response);
+            const contact_upload_stream = new ContactCreator(this.contact_controller, tenant_id);
+
+            if (list_id) {
+                const list_update_stream = new MailingListStream(this.mailing_list_controller, list_id);
+                file_stream.pipe(contact_upload_stream).pipe(list_update_stream).pipe(response);
+            } else {
+                file_stream.pipe(contact_upload_stream).pipe(response);
+            }
         } catch (e) {
             const err = this.process_failed_response(`[ContactService] created_record: ${e.message}`, 500);
             next(err);
@@ -163,4 +172,4 @@ class ContactService extends RootService {
     }
 }
 
-module.exports = new ContactService(ContactController);
+module.exports = new ContactService(ContactController, MailingListController);

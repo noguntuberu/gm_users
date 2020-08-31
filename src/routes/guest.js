@@ -5,7 +5,9 @@
 const router = require('express').Router();
 const guest_service = require('../services/guest/guest');
 
-router
+try {
+
+    router
     .post('/register', async (request, response, next) => {
         request.payload = await guest_service.create_record(request, next);
         next();
@@ -26,5 +28,9 @@ router
         request.payload = await guest_service.activate_record(request, next);
         next();
     })
-
-module.exports = router;
+    
+} catch (e) {
+    console.log(`[Route Error] /guests: ${e.message}`);
+} finally {
+    module.exports = router;
+}
