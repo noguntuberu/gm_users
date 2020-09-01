@@ -23,8 +23,8 @@ try {
             request.payload = await mailing_list_service.read_records_by_wildcard(request, next);
             next();
         })
-        .put('/contacts', async (request, response, next) => {
-            request.payload = await mailing_list_service.add_contacts_to_list(request, next);
+        .put('/:id/contacts', async (request, response, next) => {
+            request.payload = await mailing_list_service.add_contacts(request, next);
             next();
         })
         .put('/:id', async (request, response, next) => {
@@ -35,8 +35,8 @@ try {
             request.payload = await mailing_list_service.update_records(request, next);
             next();
         })
-        .delete('/:id/contacts/:contact_ids', async (request, response, next) => {
-            request.payload = await mailing_list_service.remove_contacts_from_lists(request, next);
+        .delete('/:id/contacts', async (request, response, next) => {
+            request.payload = await mailing_list_service.delete_contacts(request, next);
             next();
         })
         .delete('/:id', async (request, response, next) => {

@@ -26,7 +26,7 @@ class TenantService extends RootService {
             const { id } = request.params;
             if (!id) return next(this.process_failed_response(`Invalid ID supplied.`));
 
-            const result = await this.tenant_controller.read_records({ id, is_active: true });
+            const result = await this.tenant_controller.read_records({ id, ...this.standard_query_meta });
             return this.process_single_read(result[0]);
         } catch (e) {
             const err = this.process_failed_response(`[TenantService] update_record_by_id: ${e.message}`, 500);
@@ -38,7 +38,7 @@ class TenantService extends RootService {
         try {
             const { query } = request;
 
-            const result = await this.handle_database_read(this.tenant_controller, query);
+            const result = await this.handle_database_read(this.tenant_controller, query, { ...this.standard_query_meta});
             return this.process_multiple_read_results(result);
         } catch (e) {
             const err = this.process_failed_response(`[TenantService] read_records_by_filter: ${e.message}`, 500);
@@ -55,7 +55,10 @@ class TenantService extends RootService {
             }
 
             const wildcard_conditions = build_wildcard_options(params.keys, params.keyword);
-            const result = await this.handle_database_read(this.tenant_controller, query, wildcard_conditions);
+            const result = await this.handle_database_read(this.tenant_controller, query, {
+                ...wildcard_conditions,
+                ...this.standard_query_meta,
+            });
             return this.process_multiple_read_results(result);
         } catch (e) {
             const err = this.process_failed_response(`[TenantService] read_records_by_wildcard: ${e.message}`, 500);

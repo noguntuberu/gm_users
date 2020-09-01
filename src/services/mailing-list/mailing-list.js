@@ -5,7 +5,7 @@
 const RootService = require('../_root');
 const Observable = require('../../utilities/observable');
 const MailingListController = require('../../controllers/mailing-list');
-const MailingListSchema = require('../../schemas/mailing-list');
+const { ListContactSchema, MailingListSchema } = require('../../schemas/mailing-list');
 
 const {
     build_query,
@@ -18,6 +18,26 @@ class MailingListService extends RootService {
     ) {
         super();
         this.mailingList_controller = mailingList_controller;
+    }
+
+    async add_contacts(request, next) {
+        try {
+            const { body } = request;
+            const { error } = ListContactSchema.validate(body);
+
+            if (error) throw new Error(error);
+
+            const { id } = request.params;
+            const { contacts } = body;
+
+            const result = await this.mailingList_controller.update_records({ id }, {
+                $addToSet: { contacts: { $each: [...contacts] } },
+            });
+            return this.process_update_result(result);
+        } catch (e) {
+            const err = this.process_failed_response(`[MailingListService] add_contacts: ${e.message}`, 500);
+            next(err);
+        }
     }
 
     async create_record(request, next) {
@@ -40,7 +60,7 @@ class MailingListService extends RootService {
             const { id } = request.params;
             if (!id) return next(this.process_failed_response(`Invalid ID supplied.`));
 
-            const result = await this.mailingList_controller.read_records({ id });
+            const result = await this.mailingList_controller.read_records({ id, ...this.standard_query_meta });
             return this.process_single_read(result[0]);
         } catch (e) {
             const err = this.process_failed_response(`[MailingListService] update_record_by_id: ${e.message}`, 500);
@@ -52,7 +72,7 @@ class MailingListService extends RootService {
         try {
             const { query } = request;
 
-            const result = await this.handle_database_read(this.mailingList_controller, query);
+            const result = await this.handle_database_read(this.mailingList_controller, query, { ...this.standard_query_meta });
             return this.process_multiple_read_results(result);
         } catch (e) {
             const err = this.process_failed_response(`[MailingListService] read_records_by_filter: ${e.message}`, 500);
@@ -69,7 +89,10 @@ class MailingListService extends RootService {
             }
 
             const wildcard_conditions = build_wildcard_options(params.keys, params.keyword);
-            const result = await this.handle_database_read(this.mailingList_controller, query, wildcard_conditions);
+            const result = await this.handle_database_read(this.mailingList_controller, query, {
+                ...wildcard_conditions,
+                ...this.standard_query_meta
+            });
             return this.process_multiple_read_results(result);
         } catch (e) {
             const err = this.process_failed_response(`[MailingListService] read_records_by_wildcard: ${e.message}`, 500);
@@ -101,6 +124,26 @@ class MailingListService extends RootService {
             return this.process_update_result({ ...data, ...result });
         } catch (e) {
             const err = this.process_failed_response(`[MailingListService] update_records: ${e.message}`, 500);
+            next(err);
+        }
+    }
+
+    async delete_contacts(request, next) {
+        try {
+            const { body } = request;
+            const { error } = ListContactSchema.validate(body);
+
+            if (error) throw new Error(error);
+
+            const { id } = request.params;
+            const { contacts } = body;
+
+            const result = await this.mailingList_controller.update_records({ id }, {
+                $pullAll: { contacts: [...contacts] },
+            });
+            return this.process_update_result(result);
+        } catch (e) {
+            const err = this.process_failed_response(`[MailingListService] add_contacts: ${e.message}`, 500);
             next(err);
         }
     }

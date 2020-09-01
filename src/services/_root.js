@@ -5,9 +5,14 @@
 const { build_query } = require('../utilities/query');
 
 class RootService {
-    constructor() { }
+    constructor() {
+        this.standard_query_meta = {
+            is_active: true,
+            is_deleted: false,
+        }
+    }
 
-    delete_record_metadata (record) {
+    delete_record_metadata(record) {
         let record_to_mutate = { ...record };
 
         //
@@ -19,7 +24,7 @@ class RootService {
         //
         return { ...record_to_mutate };
     }
-    
+
     async handle_database_read(Controller, query_options, extra_options = {}) {
         const {
             count,
