@@ -3,6 +3,7 @@
 **/
 
 const { build_query } = require('../utilities/query');
+const app_events = require('../events/_events');
 
 class RootService {
     constructor() {
@@ -53,8 +54,14 @@ class RootService {
         }
     }
 
-    process_single_read(result) {
-        if (result && result.id) return this.process_successful_response(result);
+    process_single_read(result, emission = null) {
+        if (result && result.id) {
+            if (emission) {
+                const { event_name, payload } = emission;
+                app_events.emit(event_name, payload);
+            }
+            return this.process_successful_response(result)
+        };
         return this.process_failed_response(`Resource not found`, 404);
     }
 
@@ -63,14 +70,26 @@ class RootService {
         return this.process_failed_response(`Resources not found`, 404);
     }
 
-    process_update_result(result) {
-        if (result && result.ok && result.nModified) return this.process_successful_response(result);
+    process_update_result(result, emission = null) {
+        if (result && result.ok && result.nModified) {
+            if (emission) {
+                const { event_name, payload } = emission;
+                app_events.emit(event_name, payload);
+            }
+            return this.process_successful_response(result)
+        };
         if (result && result.ok && !result.nModified) return this.process_successful_response(result, 210);
         return this.process_failed_response(`Update failed`, 200);
     }
 
-    process_delete_result(result) {
-        if (result && result.nModified) return this.process_successful_response(result);
+    process_delete_result(result, emission = null) {
+        if (result && result.nModified) {
+            if (emission) {
+                const { event_name, payload } = emission;
+                app_events.emit(event_name, payload);
+            }
+            return this.process_successful_response(result)
+        };
         return this.process_failed_response(`Deletion failed.`, 200);
     }
 
@@ -81,6 +100,7 @@ class RootService {
             error: message,
             payload: null,
             status_code: code,
+            success: false,
         }
     }
 
@@ -89,6 +109,7 @@ class RootService {
             payload,
             error: null,
             status_code: code,
+            success: true,
         }
     }
 

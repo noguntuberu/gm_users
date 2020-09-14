@@ -12,6 +12,9 @@ const {
 const database = require('./src/models/_config');
 database.connect();
 
+/** Load Event Handlers Events */
+require('./src/events/_config');
+
 /** Routes Configuration */
 const route_handler = require('./src/routes/_config');
 

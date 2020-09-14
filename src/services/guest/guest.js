@@ -3,7 +3,6 @@
 **/
 //
 const _RootService = require('../_root');
-const Observabble = require('../../utilities/observable');
 const AccountRecoveryController = require('../../controllers/account-recovery');
 const OtpController = require('../../controllers/otp');
 const TenantController = require('../../controllers/tenant');

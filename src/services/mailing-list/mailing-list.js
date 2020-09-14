@@ -3,7 +3,6 @@
 **/
 //
 const RootService = require('../_root');
-const Observable = require('../../utilities/observable');
 const MailingListController = require('../../controllers/mailing-list');
 const { ListContactSchema, MailingListSchema } = require('../../schemas/mailing-list');
 

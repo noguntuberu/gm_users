@@ -3,15 +3,12 @@
 **/
 //
 const RootService = require('../_root');
-const Observable = require('../../utilities/observable');
 const ContactController = require('../../controllers/contact');
 const MailingListController = require('../../controllers/mailing-list');
 const { SingleContactSchema } = require('../../schemas/contact');
 const { ContactCreator, FileReader, MailingListStream } = require('../../utilities/streams');
-const {
-    build_query,
-    build_wildcard_options
-} = require('../../utilities/query');
+const { build_query, build_wildcard_options } = require('../../utilities/query');
+const contact_events = require('../../events/constants/contacts');
 
 class ContactService extends RootService {
     constructor(
@@ -28,14 +25,17 @@ class ContactService extends RootService {
 
     async create_record(request, next) {
         try {
-            const { body } = request;
+            const { body, subscription_id } = request;
             const { error } = SingleContactSchema.validate(body);
 
             if (error) throw new Error(error);
 
             delete body.id;
             const result = await this.contact_controller.create_record({ ...body });
-            return this.process_single_read(result);
+            return this.process_single_read(result, {
+                event_name: contact_events.created,
+                payload: { ...result, subscription_id },
+            });
         } catch (e) {
             const err = this.process_failed_response(`[ContactService] created_record: ${e.message}`, 500);
             next(err);
@@ -44,7 +44,7 @@ class ContactService extends RootService {
 
     async create_records_from_file(request, response, next) {
         try {
-            const { files, body } = request;
+            const { files, body, subscription_id } = request;
             const limits = {
                 size: 5 * 1024 * 1024,
                 type: ['text/csv'],
@@ -61,7 +61,7 @@ class ContactService extends RootService {
             if (!limits.type.includes(mimetype)) return this.process_failed_response(`Invalid file type`);
 
             const file_stream = new FileReader(data);
-            const contact_upload_stream = new ContactCreator(this.contact_controller, tenant_id);
+            const contact_upload_stream = new ContactCreator(this.contact_controller, subscription_id, tenant_id);
 
             if (list_id) {
                 const list_update_stream = new MailingListStream(this.mailing_list_controller, list_id);
@@ -110,8 +110,8 @@ class ContactService extends RootService {
 
             const wildcard_conditions = build_wildcard_options(params.keys, params.keyword);
             const result = await this.handle_database_read(this.contact_controller, query, {
-                ...wildcard_conditions, 
-                ...this.standard_query_meta, 
+                ...wildcard_conditions,
+                ...this.standard_query_meta,
             });
             return this.process_multiple_read_results(result);
         } catch (e) {

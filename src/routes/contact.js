@@ -4,13 +4,14 @@
 
 const router = require('express').Router();
 const contact_service = require('../services/contact/contact');
+const { check_batch_contact_limit, check_contact_limit } = require('../middlewares/resource');
 
 try {
     router
-    .post('/batch', async (request, response, next) => {
+    .post('/batch', check_batch_contact_limit, async (request, response, next) => {
         await contact_service.create_records_from_file(request, response, next);
     })
-    .post('/', async (request, response, next) => {
+    .post('/', check_contact_limit, async (request, response, next) => {
         request.payload = await contact_service.create_record(request, next);
         next();
     })

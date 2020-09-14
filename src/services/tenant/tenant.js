@@ -3,9 +3,7 @@
 **/
 //
 const RootService = require('../_root');
-const Observabble = require('../../utilities/observable');
 const TenantController = require('../../controllers/tenant');
-const TenantSchema = require('../../schemas/tenant');
 
 const {
     build_query,

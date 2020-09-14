@@ -3,6 +3,8 @@
  */
 
 const { Transform, Readable, } = require('stream');
+const contact_event = require('../events/constants/contacts');
+const app_events = require('../events/_events');
 
 class FileReader extends Readable {
     constructor(source, options = {}) {
@@ -33,9 +35,11 @@ class FileReader extends Readable {
 }
 
 class ContactCreator extends Transform {
-    constructor(ContactController, tenant_id, options = {}) {
+    constructor(ContactController, subscription_id, tenant_id, options = {}) {
         super(options);
         this._contact_controller = ContactController;
+        this._count = 0;
+        this._subscription_id = subscription_id;
         this.tenant_id = tenant_id;
     }
 
@@ -47,11 +51,28 @@ class ContactCreator extends Transform {
                 ...as_object,
                 tenant_id: this.tenant_id,
             });
+
+            if (record && record.id) {
+                this._count += 1;
+            }
+
             this.push(JSON.stringify({ raw: as_object, record }));
             callback();
         } catch (e) {
-            console.log(`[ContcatCreator Stream Error] ${e.message}` );
+            console.log(`[ContcatCreator Stream _transform Error] ${e.message}`);
             this.push(chunk);
+        }
+    }
+
+    _flush(callback) {
+        try {
+            app_events.emit(contact_event.batch_created, {
+                subscription_id: this._subscription_id,
+                count: this._count
+            });
+            callback();
+        } catch (e) {
+            console.log(`[ContcatCreator Stream _flush Error] ${e.message}`);
         }
     }
 }
@@ -74,13 +95,13 @@ class MailingListStream extends Transform {
                 await this._listController.update_records({ id: this._list_id }, {
                     $addToSet: { contacts: as_object.record.id },
                 });
-                transformed_chunk = { data: as_object.record, success: true};
+                transformed_chunk = { data: as_object.record, success: true };
             }
-    
+
             this.push(JSON.stringify(transformed_chunk));
             callback();
         } catch (e) {
-            console.log(`[MailingListStream Error] ${e.message}` );
+            console.log(`[MailingListStream Error] ${e.message}`);
             this.push(chunk);
         }
     }
