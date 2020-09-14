@@ -8,6 +8,7 @@ const { promisify } = require('util');
 const jwt_sign = promisify(sign);
 
 const {
+    JWT_ISSUER,
     JWT_SECRET,
 } = process.env;
 
@@ -25,7 +26,10 @@ module.exports = {
 
     generate_authentication_token: async (data) => {
         const expiresIn = 21600000;
-        const token = await jwt_sign({ ...data }, JWT_SECRET, { expiresIn });
+        const token = await jwt_sign({ ...data }, JWT_SECRET, { 
+            expiresIn,
+            issuer: JWT_ISSUER,
+        });
         return token;
     },
 
