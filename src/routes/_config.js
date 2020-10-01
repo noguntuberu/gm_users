@@ -19,11 +19,10 @@ const tenant_route_handler = require('./tenant');
 
 /** Cross Origin Handling */
 router.use(setup_request);
-router.use(authenticate_user);
-router.use('/contacts', contact_route_handler);
 router.use('/guests', guest_route_handler);
-router.use('/mailing-lists', mailing_list_route_handler);
-router.use('/tenants', tenant_route_handler);
+router.use('/contacts', authenticate_user, contact_route_handler);
+router.use('/mailing-lists', authenticate_user, mailing_list_route_handler);
+router.use('/tenants', authenticate_user, tenant_route_handler);
 router.use(process_response);
 
 /** Static Routes */

@@ -16,7 +16,7 @@ module.exports.connect = () => {
             useUnifiedTopology: true,
         }, (err, data) => {
             if (err) {
-                console.log(`Could not connect to database`);
+                console.log(`Could not connect to database: ${err.message}`);
                 return;
             }
     
