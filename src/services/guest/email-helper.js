@@ -55,7 +55,7 @@ const configure_message = (recipient, value, type) => {
             html = `
                         <p> Kindly click the link to recover your account.<p>
                         <br/>
-                        <p><a href=${APP_CLIENT_URI}/guests/password/reset/${value}>Recover Account</a></p>
+                        <p><a href=${APP_CLIENT_URI}/password/reset/${value}>Recover Account</a></p>
                     `;
             break;
         default:
