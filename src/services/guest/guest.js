@@ -202,6 +202,7 @@ class GuestService extends _RootService {
             const { ok, nModified } = user_updation;
 
             if (user_updation && ok && nModified) {
+                this.account_recovery_controller.update_records({ _id: recovery_id}, { expires_at: (Date.now() - 86400000)});
                 return this.process_successful_response(`Password reset successfully.`);
             }
 
