@@ -8,7 +8,7 @@ const {
     MAIL_PASS,
     MAIL_PORT,
     MAIL_USER,
-    APP_BASE_URI,
+    APP_CLIENT_URI,
 } = process.env;
 
 const configure_mail_transport = () => {
@@ -37,7 +37,7 @@ const configure_message = (recipient, value, type) => {
             html = `
                     <p> Kindly click the link to activate your account.<p>
                     <br/>
-                    <p><a href=${APP_BASE_URI}/guests/activation/${value}>Activate Account</a></p>
+                    <p><a href=${APP_CLIENT_URI}/guests/activation/${value}>Activate Account</a></p>
                 `;
             break;
         case 'otp':
@@ -55,7 +55,7 @@ const configure_message = (recipient, value, type) => {
             html = `
                         <p> Kindly click the link to recover your account.<p>
                         <br/>
-                        <p><a href=${APP_BASE_URI}/guests/password/reset/${value}>Recover Account</a></p>
+                        <p><a href=${APP_CLIENT_URI}/guests/password/reset/${value}>Recover Account</a></p>
                     `;
             break;
         default:
