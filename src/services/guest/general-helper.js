@@ -26,7 +26,7 @@ module.exports = {
 
     generate_authentication_token: async (data) => {
         const expiresIn = 21600000;
-        const token = await jwt_sign({ ...data }, JWT_SECRET, { 
+        const token = await jwt_sign({ ...data, tenant_id: data.id }, JWT_SECRET, { 
             expiresIn,
             issuer: JWT_ISSUER,
         });

@@ -97,8 +97,12 @@ class GuestService extends _RootService {
     async initiate_password_reset(request, next) {
         try {
             const { email } = request.body;
-            const email_validation = this.validate_email(email);
 
+            if (!email) {
+                return this.process_failed_response('Email not specified', 400);
+            } 
+
+            const email_validation = this.validate_email(email);
             if (!email_validation.is_valid) {
                 return this.process_failed_response(email_validation.message, 400);
             }
