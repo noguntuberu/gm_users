@@ -127,8 +127,9 @@ class ContactService extends RootService {
 
             if (!id) return next(this.process_failed_response(`Invalid ID supplied.`));
 
-            const result = await this.contact_controller.update_records({ id }, { ...data });
-            return this.process_update_result(result);
+            const new_data = this.delete_record_metadata(data);
+            const result = await this.contact_controller.update_records({ id }, { ...new_data });
+            return this.process_update_result({ ...result, ...data });
         } catch (e) {
             const err = this.process_failed_response(`[ContactService] update_record_by_id: ${e.message}`, 500);
             next(err);
@@ -140,8 +141,9 @@ class ContactService extends RootService {
             const { options, data } = request.body;
             const { seek_conditions } = build_query(options);
 
-            const result = await this.contact_controller.update_records({ ...seek_conditions }, { ...data });
-            return this.process_update_result({ ...data, ...result });
+            const new_data = this.delete_record_metadata(data);
+            const result = await this.contact_controller.update_records({ ...seek_conditions }, { ...new_data });
+            return this.process_update_result({ ...new_data, ...result });
         } catch (e) {
             const err = this.process_failed_response(`[ContactService] update_records: ${e.message}`, 500);
             next(err);

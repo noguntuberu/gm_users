@@ -15,7 +15,7 @@ const process_error = (message, code = 410) => {
 
 const fetch_subscription_info = async (tenant_id, response) => {
     try {
-        const resource_response = await axios.get(`${SALES_URI}/subscriptions?tenant_id=${tenant_id}`);
+        const resource_response = await axios.get(`${SALES_URI}/subscriptions?tenant_id=${tenant_id}&sort_by=-created_on`);
         const { error, payload, success } = resource_response.data;
         if (!success || error) {
             throw new Error(error);
@@ -27,7 +27,7 @@ const fetch_subscription_info = async (tenant_id, response) => {
 
         return payload[0];
     } catch (e) {
-        console.log(`[Resource Error] fetch_subscription_info: ${e.message}`);
+        client_logger.error(`[Resource Error] fetch_subscription_info: ${e.message}`);
         next(e);
     }
 }
@@ -48,7 +48,6 @@ const update_subscription_info = async (subscription_id, data) => {
             `);
         }
     } catch (e) {
-        console.log(`[Resource Error] update_subscription_info`);
         client_logger.error(`[Resource Error] update_subscription_info: ${e.message}`);
     }
 }
