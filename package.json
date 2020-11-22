@@ -35,7 +35,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "nyc mocha --recursive -w -c || true",
-    "pm2": "pm2 start index.js --name user --watch ~/Documents/GoMailer/services/user/src --max-memory-restart '300M' --restart-delay 500"
+    "pm2": "pm2 start index.js --name user --watch /apps/gm/gm_users/src --max-memory-restart '300M' --restart-delay 500"
   },
   "repository": {
     "type": "git",
