@@ -1,7 +1,7 @@
 /** */
 require('dotenv').config();
 const axios = require('axios').default;
-const { SALES_URI } = process.env;
+const { GM_SALES_URI } = process.env;
 const { client_logger } = require('../utilities/logger');
 
 const process_error = (message, code = 410) => {
@@ -15,7 +15,7 @@ const process_error = (message, code = 410) => {
 
 const fetch_subscription_info = async (tenant_id, response) => {
     try {
-        const resource_response = await axios.get(`${SALES_URI}/subscriptions?tenant_id=${tenant_id}&sort_by=-created_on`);
+        const resource_response = await axios.get(`${GM_SALES_URI}/subscriptions?tenant_id=${tenant_id}&sort_by=-created_on`);
         const { error, payload, success } = resource_response.data;
         if (!success || error) {
             throw new Error(error);
@@ -34,7 +34,7 @@ const fetch_subscription_info = async (tenant_id, response) => {
 
 const update_subscription_info = async (subscription_id, data) => {
     try {
-        const resource_response = await axios.put(`${SALES_URI}/subscriptions/${subscription_id}/resources`, {
+        const resource_response = await axios.put(`${GM_SALES_URI}/subscriptions/${subscription_id}/resources`, {
             ...data
         });
         const { error, status_code, success } = resource_response.data;
