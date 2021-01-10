@@ -142,7 +142,7 @@ class MailingListService extends RootService {
             });
             return this.process_update_result(result);
         } catch (e) {
-            const err = this.process_failed_response(`[MailingListService] add_contacts: ${e.message}`, 500);
+            const err = this.process_failed_response(`[MailingListService] delete_contacts: ${e.message}`, 500);
             next(err);
         }
     }

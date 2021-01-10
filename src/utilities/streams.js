@@ -22,14 +22,18 @@ class FileReader extends Readable {
     }
 
     _read() {
-        for (let line in this._source) {
-            const as_array = this._source[line].split(',');
-            const chunk = JSON.stringify({
-                [this._source_keys[0]]: as_array[0],
-                [this._source_keys[1]]: as_array[1],
-            });
+        this._source.forEach((line, i) => {
+            const as_array = line.split(',');
+            const chunk = JSON.stringify(this._source_keys.reduce((result, key, index) => ({
+                ...result,
+                [key]: as_array[index],
+            }), {
+                total: this._source.length,
+                uploaded: i + 1,
+            }));
+
             this.push(chunk);
-        }
+        })
         this.push(null);
     }
 }
@@ -95,7 +99,14 @@ class MailingListStream extends Transform {
                 await this._listController.update_records({ id: this._list_id }, {
                     $addToSet: { contacts: as_object.record.id },
                 });
-                transformed_chunk = { data: as_object.record, success: true };
+                transformed_chunk = { 
+                    data: as_object.record,
+                    metadata: {
+                        total: as_object.raw.total,
+                        uploaded: as_object.raw.uploaded,
+                    },
+                    success: true 
+                };
             }
 
             this.push(JSON.stringify(transformed_chunk));
