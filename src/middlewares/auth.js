@@ -5,7 +5,7 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const { logger } = require('../utilities/logger');
 const { process_error } = require('../clients/resource');
-const { JWT_ISSUER, JWT_SECRET } = process.env;
+const { JWT_ISSUER, JWT_SECRET, GM_TOKEN } = process.env;
 
 const authenticate_user = async (request, response, next) => {
     try {
@@ -18,6 +18,10 @@ const authenticate_user = async (request, response, next) => {
         const token = auth_parts[1];
         if (!token) {
             return next(process_error(`Unauthorized`, 403));
+        }
+
+        if (token === GM_TOKEN ) {
+            next();
         }
 
         const verified_data = await jwt.verify(token, JWT_SECRET, {
