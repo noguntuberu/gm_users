@@ -37,7 +37,7 @@ const configure_message = (recipient, value, type) => {
             html = `
                     <p> Kindly click the link to activate your account.<p>
                     <br/>
-                    <p><a href=${APP_CLIENT_URI}/guests/activation/${value}>Activate Account</a></p>
+                    <p><a href=${APP_CLIENT_URI}/activation/${value}>Activate Account</a></p>
                 `;
             break;
         case 'otp':
