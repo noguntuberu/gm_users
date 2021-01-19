@@ -78,9 +78,10 @@ class ContactService extends RootService {
     async read_record_by_id(request, next) {
         try {
             const { id } = request.params;
+            const { tenant_id } = request;
             if (!id) return next(this.process_failed_response(`Invalid ID supplied.`));
 
-            const result = await this.contact_controller.read_records({ id, ...this.standard_query_meta });
+            const result = await this.contact_controller.read_records({ id, tenant_id, ...this.standard_query_meta });
             return this.process_single_read(result[0]);
         } catch (e) {
             const err = this.process_failed_response(`[ContactService] update_record_by_id: ${e.message}`, 500);
@@ -90,9 +91,8 @@ class ContactService extends RootService {
 
     async read_records_by_filter(request, next) {
         try {
-            const { query } = request;
-
-            const result = await this.handle_database_read(this.contact_controller, query, { ...this.standard_query_meta });
+            const { query, tenant_id } = request;
+            const result = await this.handle_database_read(this.contact_controller, query, { ...this.standard_query_meta, tenant_id });
             return this.process_multiple_read_results(result);
         } catch (e) {
             const err = this.process_failed_response(`[ContactService] read_records_by_filter: ${e.message}`, 500);
@@ -102,7 +102,7 @@ class ContactService extends RootService {
 
     async read_records_by_wildcard(request, next) {
         try {
-            const { params, query } = request;
+            const { params, query, tenant_id } = request;
 
             if (!params.keys || !params.keys) {
                 return next(this.process_failed_response(`Invalid key/keyword`, 400));
@@ -112,6 +112,7 @@ class ContactService extends RootService {
             const result = await this.handle_database_read(this.contact_controller, query, {
                 ...wildcard_conditions,
                 ...this.standard_query_meta,
+                tenant_id,
             });
             return this.process_multiple_read_results(result);
         } catch (e) {
@@ -122,13 +123,14 @@ class ContactService extends RootService {
 
     async update_record_by_id(request, next) {
         try {
+            const { tenant_id } = request;
             const { id } = request.params;
             const data = request.body;
 
             if (!id) return next(this.process_failed_response(`Invalid ID supplied.`));
 
             const new_data = this.delete_record_metadata(data);
-            const result = await this.contact_controller.update_records({ id }, { ...new_data });
+            const result = await this.contact_controller.update_records({ id, tenant_id }, { ...new_data });
             return this.process_update_result({ ...result, ...data });
         } catch (e) {
             const err = this.process_failed_response(`[ContactService] update_record_by_id: ${e.message}`, 500);
@@ -138,11 +140,12 @@ class ContactService extends RootService {
 
     async update_records(request, next) {
         try {
+            const { tenant_id } = request;
             const { options, data } = request.body;
             const { seek_conditions } = build_query(options);
 
             const new_data = this.delete_record_metadata(data);
-            const result = await this.contact_controller.update_records({ ...seek_conditions }, { ...new_data });
+            const result = await this.contact_controller.update_records({ ...seek_conditions, tenant_id }, { ...new_data });
             return this.process_update_result({ ...new_data, ...result });
         } catch (e) {
             const err = this.process_failed_response(`[ContactService] update_records: ${e.message}`, 500);
@@ -152,10 +155,11 @@ class ContactService extends RootService {
 
     async delete_record_by_id(request, next) {
         try {
+            const { tenant_id } = request;
             const { id } = request.params;
             if (!id) return next(this.process_failed_response(`Invalid ID supplied.`));
 
-            const result = await this.contact_controller.delete_records({ id });
+            const result = await this.contact_controller.delete_records({ id, tenant_id });
             return this.process_delete_result(result);
         } catch (e) {
             const err = this.process_failed_response(`[ContactService] delete_record_by_id: ${e.message}`, 500);
@@ -165,10 +169,11 @@ class ContactService extends RootService {
 
     async delete_records(request, next) {
         try {
+            const { tenant_id } = request;
             const { options } = request.body;
             const { seek_conditions } = build_query(options);
 
-            const result = await this.contact_controller.delete_records({ ...seek_conditions });
+            const result = await this.contact_controller.delete_records({ ...seek_conditions, tenant_id });
             return this.process_delete_result({ ...result });
         } catch (e) {
             const err = this.process_failed_response(`[ContactService] delete_records: ${e.message}`, 500);
