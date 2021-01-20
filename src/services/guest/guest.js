@@ -87,7 +87,7 @@ class GuestService extends _RootService {
             }
 
             await send_email(validated_email, _id, 'activation');
-            return this.process_successful_response(`Account created succesfully.`);
+            return this.process_successful_response(`Account created succesfully. Activation link sent to ${validated_email}`);
         } catch (e) {
             const err = this.process_failed_response(`[GuestService] create_record: ${e.message}`, 500);
             next(err);
