@@ -1,7 +1,7 @@
 /** */
 require('dotenv').config();
 const axios = require('axios').default;
-const { GM_SALES_URI } = process.env;
+const { GM_SALES_URI, GM_TOKEN } = process.env;
 const { client_logger } = require('../utilities/logger');
 
 const process_error = (message, code = 410) => {
@@ -14,41 +14,44 @@ const process_error = (message, code = 410) => {
 }
 
 const fetch_subscription_info = async (tenant_id, response) => {
-    try {
-        const resource_response = await axios.get(`${GM_SALES_URI}/subscriptions?tenant_id=${tenant_id}&sort_by=-created_on`);
-        const { error, payload, success } = resource_response.data;
-        if (!success || error) {
-            throw new Error(error);
+    const resource_response = await axios.get(`${GM_SALES_URI}/subscriptions?tenant_id=${tenant_id}&sort_by=-created_on`, {
+        headers: {
+            authorization: `Bearer ${GM_TOKEN}`
         }
-
-        if (!payload.length) {
-            return response.status(410).send(process_error(`Subscription not found`, 410));
-        }
-
-        return payload[0];
-    } catch (e) {
-        client_logger.error(`[Resource Error] fetch_subscription_info: ${e.message}`);
-        next(e);
+    });
+    const { error, payload } = resource_response.data;
+    if (error) {
+        client_logger.error(`[Resource Error] fetch_subscription_info: ${error}`);
+        throw new Error(error);
     }
+
+    if (!payload.length) {
+        client_logger.error(`[Resource Error] fetch_subscription_info: Subscription not found`);
+        throw new Error(`Subscription not found`);
+    }
+
+    return payload[0];
+
 }
 
 const update_subscription_info = async (subscription_id, data) => {
-    try {
-        const resource_response = await axios.put(`${GM_SALES_URI}/subscriptions/${subscription_id}/resources`, {
-            ...data
-        });
-        const { error, status_code, success } = resource_response.data;
-        if (!success || error) {
-            throw new Error(error);
+    const resource_response = await axios.put(`${GM_SALES_URI}/subscriptions/${subscription_id}/resources`, {
+        ...data
+    }, {
+        headers: {
+            authorization: `Bearer ${GM_TOKEN}`
         }
+    });
 
-        if (success && status_code != 200) {
-            throw new Error(`
-                Could not update subscription ${subscription_id}: ${JSON.stringify(data)}
-            `);
-        }
-    } catch (e) {
-        client_logger.error(`[Resource Error] update_subscription_info: ${e.message}`);
+    const { error, status_code } = resource_response.data;
+    if (error) {
+        client_logger.error(`[Resource Error] update_subscription_info: ${error}`);
+        throw new Error(error);
+    }
+
+    if (status_code != 200) {
+        client_logger.error(`[Resource Error] update_subscription_info: Could not update subscription ${subscription_id}: ${JSON.stringify(data)}`);
+        throw new Error(`Could not update subscription ${subscription_id}: ${JSON.stringify(data)}`);
     }
 }
 

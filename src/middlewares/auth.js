@@ -20,8 +20,9 @@ const authenticate_user = async (request, response, next) => {
             return next(process_error(`Unauthorized`, 403));
         }
 
-        if (token === GM_TOKEN ) {
-            next();
+        if (token === GM_TOKEN) {
+            request.tenant_id = { $exists: true }
+            return next();
         }
 
         const verified_data = await jwt.verify(token, JWT_SECRET, {
@@ -36,8 +37,7 @@ const authenticate_user = async (request, response, next) => {
         request.tenant_id = tenant_id;
         next();
     } catch (e) {
-        console.log(`[Auth Error] ${e.message}`);
-        logger.log(`[Auth Error] ${e.message}`);
+        logger.error(`[Auth Error] ${e.message}`);
     }
 }
 

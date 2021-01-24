@@ -18,7 +18,7 @@ module.exports = {
 
         // Log errors
         logger.error(error.error);
-
+        console.log(error);
         // return error
         return response.status(error.status_code || 500).json({
             status_code: error.status_code,

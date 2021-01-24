@@ -3,6 +3,7 @@
 **/
 
 const router = require('express').Router();
+const {resolve} = require('path');
 const {
     handle_404,
     handle_error,
@@ -23,12 +24,17 @@ router.use('/guests', guest_route_handler);
 router.use('/contacts', authenticate_user, contact_route_handler);
 router.use('/mailing-lists', authenticate_user, mailing_list_route_handler);
 router.use('/tenants', authenticate_user, tenant_route_handler);
+router.get(`/templates/:type`, async (request, response, next) => {
+    const {type} = request.params;
+    return response.download(resolve(__dirname, `../../public/samples/${type}.csv`));
+});
 router.use(process_response);
 
 /** Static Routes */
 router.use('/image/:image_name', (request, response) => {
-
+    
 });
+
 
 router.use(handle_404);
 router.use(handle_error);
