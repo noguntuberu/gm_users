@@ -13,5 +13,6 @@ module.exports.MailingListSchema = Joi.object({
 });
 
 module.exports.ListContactSchema = Joi.object({
-    contacts: Joi.array().items(Joi.number().required()).required()
+    contacts: Joi.array().items(Joi.number().required()).required(),
+    unsubscribed_from: Joi.number(),
 });

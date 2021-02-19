@@ -28,6 +28,10 @@ try {
         request.payload = await guest_service.activate_record(request, next);
         next();
     })
+    .put('/unsubscribe/:id', async (request, response, next) => {
+        request.payload = await guest_service.unsubscribe(request, next);
+        next();
+    })
     
 } catch (e) {
     console.log(`[Route Error] /guests: ${e.message}`);

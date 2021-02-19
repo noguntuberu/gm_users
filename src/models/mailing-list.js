@@ -10,11 +10,38 @@ const MailingListSchema = new Schema({
         required: true,
         default: 0,
     },
-    contacts: {
-        type: Array,
-        required: true,
-        default: [],
-    },
+    contacts: [
+        {
+            id: {
+                type: Number,
+                required: true,
+            },
+            unsubscribed_from: {
+                type: Number,
+                required: false,
+            },
+            time_added: {
+                type: Date,
+                required: true,
+                default: () => new Date(),
+            },
+            time_removed: {
+                type: Date,
+                required: true,
+                default: () => new Date(),
+            },
+            is_active: {
+                type: Boolean,
+                required: true,
+                default: true,
+            },
+            is_unsubscribed: {
+                type: Boolean,
+                required: true,
+                default: false,
+            },
+        }
+    ],
     description : {
         type: String,
         required: false,

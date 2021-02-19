@@ -6,6 +6,8 @@ const _RootService = require('../_root');
 const AccountRecoveryController = require('../../controllers/account-recovery');
 const OtpController = require('../../controllers/otp');
 const TenantController = require('../../controllers/tenant');
+const MailingListModel = require('../../models/mailing-list');
+const { ListContactSchema } = require('../../schemas/mailing-list');
 
 const { AccountRecoverySchema, LogInSchema, SignUpSchema } = require('../../schemas/guest');
 const {
@@ -214,6 +216,37 @@ class GuestService extends _RootService {
 
         } catch (e) {
             const err = this.process_failed_response(`[GuestService] reset password: ${e.message}`, 500);
+            next(err);
+        }
+    }
+
+    async unsubscribe(request, next) {
+        try {
+            const { body } = request;
+            const { error } = ListContactSchema.validate(body);
+
+            if (error) throw new Error(error);
+
+            const { id } = request.params;
+            const { contacts, unsubscribed_from } = body;
+            console.log({ id, contacts, unsubscribed_from});
+            const result = await MailingListModel.updateMany({}, {
+                $set: {
+                    "contacts.$[element].time_removed": new Date(),
+                    "contacts.$[element].is_active": false,
+                    "contacts.$[element].is_unsubscribed": true,
+                    "contacts.$[element].unsubscribed_from": unsubscribed_from,
+                },
+            }, {
+                multi: true,
+                arrayFilters: [
+                    { "element.id": { $in: [...contacts] } },
+                    { id }
+                ],
+            });
+            return this.process_update_result(result);
+        } catch (e) {
+            const err = this.process_failed_response(`[MailingListService] delete_contacts: ${e.message}`, 500);
             next(err);
         }
     }

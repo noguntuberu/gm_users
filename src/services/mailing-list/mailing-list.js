@@ -4,6 +4,7 @@
 //
 const RootService = require('../_root');
 const MailingListController = require('../../controllers/mailing-list');
+const MailingListModel = require('../../models/mailing-list');
 const { ListContactSchema, MailingListSchema } = require('../../schemas/mailing-list');
 
 const {
@@ -28,9 +29,12 @@ class MailingListService extends RootService {
 
             const { id } = request.params;
             const { contacts } = body;
+            const formatted_contacts_for_db = contacts.map(contact => ({
+                id: contact,
+            }));
 
             const result = await this.mailingList_controller.update_records({ id, tenant_id }, {
-                $addToSet: { contacts: { $each: [...contacts] } },
+                $addToSet: { contacts: { $each: [...formatted_contacts_for_db] } },
             });
             return this.process_update_result(result);
         } catch (e) {
@@ -103,7 +107,7 @@ class MailingListService extends RootService {
 
     async update_record_by_id(request, next) {
         try {
-            const { tenant_id }  = request;
+            const { tenant_id } = request;
             const { id } = request.params;
             const data = request.body;
 
@@ -141,8 +145,18 @@ class MailingListService extends RootService {
             const { id } = request.params;
             const { contacts } = body;
 
-            const result = await this.mailingList_controller.update_records({ id, tenant_id }, {
-                $pullAll: { contacts: [...contacts] },
+            TODO: 'how can we use a controller here?'
+            const result = await MailingListModel.updateMany({}, {
+                $set: {
+                    "contacts.$[element].time_removed": new Date(),
+                    "contacts.$[element].is_active": false,
+                },
+            }, {
+                multi: true,
+                arrayFilters: [
+                    { "element.id": { $in: [...contacts] } },
+                    { id, tenant_id, }
+                ],
             });
             return this.process_update_result(result);
         } catch (e) {
