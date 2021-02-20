@@ -102,7 +102,7 @@ class GuestService extends _RootService {
 
             if (!email) {
                 return this.process_failed_response('Email not specified', 400);
-            } 
+            }
 
             const email_validation = this.validate_email(email);
             if (!email_validation.is_valid) {
@@ -204,7 +204,7 @@ class GuestService extends _RootService {
             const { ok, nModified } = user_updation;
 
             if (user_updation && ok && nModified) {
-                this.account_recovery_controller.update_records({ _id: recovery_id}, { expires_at: (Date.now() - 86400000)});
+                this.account_recovery_controller.update_records({ _id: recovery_id }, { expires_at: (Date.now() - 86400000) });
                 return this.process_successful_response(`Password reset successfully.`);
             }
 
@@ -229,7 +229,7 @@ class GuestService extends _RootService {
 
             const { id } = request.params;
             const { contacts, unsubscribed_from } = body;
-            console.log({ id, contacts, unsubscribed_from});
+            console.log({ id, contacts, unsubscribed_from });
             const result = await MailingListModel.updateMany({}, {
                 $set: {
                     "contacts.$[element].time_removed": new Date(),
@@ -241,7 +241,7 @@ class GuestService extends _RootService {
                 multi: true,
                 arrayFilters: [
                     { "element.id": { $in: [...contacts] } },
-                    { id }
+                    { id: { $in: [id.split()] } }
                 ],
             });
             return this.process_update_result(result);
