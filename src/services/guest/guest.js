@@ -229,7 +229,6 @@ class GuestService extends _RootService {
 
             const { id } = request.params;
             const { contacts, unsubscribed_from } = body;
-            console.log({ id, contacts, unsubscribed_from });
             const result = await MailingListModel.updateMany({}, {
                 $set: {
                     "contacts.$[element].time_removed": new Date(),

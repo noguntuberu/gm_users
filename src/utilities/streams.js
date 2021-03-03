@@ -97,15 +97,16 @@ class MailingListStream extends Transform {
                 transformed_chunk = { data: as_object.raw, success: false }
             } else {
                 await this._listController.update_records({ id: this._list_id }, {
-                    $addToSet: { contacts: as_object.record.id },
+                    $addToSet: { contacts: { $each: [as_object.record] } },
                 });
-                transformed_chunk = { 
+
+                transformed_chunk = {
                     data: as_object.record,
                     metadata: {
                         total: as_object.raw.total,
                         uploaded: as_object.raw.uploaded,
                     },
-                    success: true 
+                    success: true
                 };
             }
 
