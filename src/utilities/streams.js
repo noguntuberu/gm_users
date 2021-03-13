@@ -26,7 +26,7 @@ class FileReader extends Readable {
             const as_array = line.split(',');
             const chunk = JSON.stringify(this._source_keys.reduce((result, key, index) => ({
                 ...result,
-                [key]: as_array[index],
+                [key]: as_array[index] || '',
             }), {
                 total: this._source.length,
                 uploaded: i + 1,
