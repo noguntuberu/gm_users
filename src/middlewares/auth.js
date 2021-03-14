@@ -3,9 +3,34 @@
  */
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const axios = require('axios').default;
 const { logger } = require('../utilities/logger');
 const { process_error } = require('../clients/resource');
-const { JWT_ISSUER, JWT_SECRET, GM_TOKEN } = process.env;
+const { JWT_ISSUER, JWT_SECRET, GM_ACCESS, GM_TOKEN } = process.env;
+
+const authenticate_api_key = async (request, response, next) => {
+    try {
+        const { authorization } = request.headers;
+        if (!authorization) {
+            return next(process_error(`Unauthorized`, 403));
+        }
+
+        const [, api_key] = authorization.split(' ');
+        if (!api_key) {
+            return next(process_error(`Unauthorized`, 403));
+        }
+
+        const { error, payload } = (await axios.get(`${GM_ACCESS}/verify/${api_key}`)).data;
+        if (error) {
+            return next(process_error(`Unauthorized`, 403));
+        }
+
+        request.tenant_id = payload.org_id;
+        next()
+    } catch (e) {
+        logger.error(`[Auth Error] ${e.message}`);
+    }
+}
 
 const authenticate_user = async (request, response, next) => {
     try {
@@ -41,4 +66,4 @@ const authenticate_user = async (request, response, next) => {
     }
 }
 
-module.exports = { authenticate_user };
+module.exports = { authenticate_api_key, authenticate_user };

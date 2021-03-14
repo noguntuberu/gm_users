@@ -25,13 +25,13 @@ class ContactService extends RootService {
 
     async create_record(request, next) {
         try {
-            const { body, subscription_id } = request;
+            const { body, subscription_id, tenant_id } = request;
             const { error } = SingleContactSchema.validate(body);
 
             if (error) throw new Error(error);
 
             delete body.id;
-            const result = await this.contact_controller.create_record({ ...body });
+            const result = await this.contact_controller.create_record({ ...body, tenant_id });
             return this.process_single_read(result, {
                 event_name: contact_events.created,
                 payload: { ...result, subscription_id },

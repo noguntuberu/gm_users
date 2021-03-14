@@ -17,5 +17,6 @@ module.exports.SingleContactSchema = Joi.object({
     firstname: Joi.string(),
     id: Joi.string().min(1).max(Number.MAX_SAFE_INTEGER),
     lastname: Joi.string(),
+    lists: Joi.array(),
     tenant_id: Joi.number().required(),
 });

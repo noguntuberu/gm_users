@@ -14,10 +14,10 @@ const {
 
 class MailingListService extends RootService {
     constructor(
-        mailingList_controller
+        mailing_list_controller
     ) {
         super();
-        this.mailingList_controller = mailingList_controller;
+        this.mailing_list_controller = mailing_list_controller;
     }
 
     async add_contacts(request, next) {
@@ -33,7 +33,7 @@ class MailingListService extends RootService {
                 id: contact,
             }));
 
-            const result = await this.mailingList_controller.update_records({ id, tenant_id }, {
+            const result = await this.mailing_list_controller.update_records({ id, tenant_id }, {
                 $addToSet: { contacts: { $each: [...formatted_contacts_for_db] } },
             });
             return this.process_update_result(result);
@@ -45,12 +45,12 @@ class MailingListService extends RootService {
 
     async create_record(request, next) {
         try {
-            const { body } = request;
+            const { body, tenant_id } = request;
             const { error } = MailingListSchema.validate(body);
 
             if (error) throw new Error(error);
 
-            const result = await this.mailingList_controller.create_record({ ...body });
+            const result = await this.mailing_list_controller.create_record({ ...body, tenant_id });
             return this.process_single_read(result);
         } catch (e) {
             const err = this.process_failed_response(`[MailingListService] created_record: ${e.message}`, 500);
@@ -64,7 +64,7 @@ class MailingListService extends RootService {
             const { id } = request.params;
             if (!id) return next(this.process_failed_response(`Invalid ID supplied.`));
 
-            const result = await this.mailingList_controller.read_records({ id, ...this.standard_query_meta, tenant_id });
+            const result = await this.mailing_list_controller.read_records({ id, ...this.standard_query_meta, tenant_id });
             return this.process_single_read(result[0]);
         } catch (e) {
             const err = this.process_failed_response(`[MailingListService] update_record_by_id: ${e.message}`, 500);
@@ -76,7 +76,7 @@ class MailingListService extends RootService {
         try {
             const { query, tenant_id } = request;
 
-            const result = await this.handle_database_read(this.mailingList_controller, query, { ...this.standard_query_meta, tenant_id });
+            const result = await this.handle_database_read(this.mailing_list_controller, query, { ...this.standard_query_meta, tenant_id });
             return this.process_multiple_read_results(result);
         } catch (e) {
             const err = this.process_failed_response(`[MailingListService] read_records_by_filter: ${e.message}`, 500);
@@ -93,7 +93,7 @@ class MailingListService extends RootService {
             }
 
             const wildcard_conditions = build_wildcard_options(params.keys, params.keyword);
-            const result = await this.handle_database_read(this.mailingList_controller, query, {
+            const result = await this.handle_database_read(this.mailing_list_controller, query, {
                 ...wildcard_conditions,
                 ...this.standard_query_meta,
                 tenant_id,
@@ -113,7 +113,7 @@ class MailingListService extends RootService {
 
             if (!id) return next(this.process_failed_response(`Invalid ID supplied.`));
 
-            const result = await this.mailingList_controller.update_records({ id, tenant_id }, { ...data });
+            const result = await this.mailing_list_controller.update_records({ id, tenant_id }, { ...data });
             return this.process_update_result(result);
         } catch (e) {
             const err = this.process_failed_response(`[MailingListService] update_record_by_id: ${e.message}`, 500);
@@ -127,7 +127,7 @@ class MailingListService extends RootService {
             const { options, data } = request.body;
             const { seek_conditions } = build_query(options);
 
-            const result = await this.mailingList_controller.update_records({ ...seek_conditions, tenant_id }, { ...data });
+            const result = await this.mailing_list_controller.update_records({ ...seek_conditions, tenant_id }, { ...data });
             return this.process_update_result({ ...data, ...result });
         } catch (e) {
             const err = this.process_failed_response(`[MailingListService] update_records: ${e.message}`, 500);
@@ -171,7 +171,7 @@ class MailingListService extends RootService {
             const { id } = request.params;
             if (!id) return next(this.process_failed_response(`Invalid ID supplied.`));
 
-            const result = await this.mailingList_controller.delete_records({ id, tenant_id });
+            const result = await this.mailing_list_controller.delete_records({ id, tenant_id });
             return this.process_delete_result(result);
         } catch (e) {
             const err = this.process_failed_response(`[MailingListService] delete_record_by_id: ${e.message}`, 500);
@@ -185,7 +185,7 @@ class MailingListService extends RootService {
             const { options } = request.body;
             const { seek_conditions } = build_query(options);
 
-            const result = await this.mailingList_controller.delete_records({ ...seek_conditions, tenant_id });
+            const result = await this.mailing_list_controller.delete_records({ ...seek_conditions, tenant_id });
             return this.process_delete_result({ ...result });
         } catch (e) {
             const err = this.process_failed_response(`[MailingListService] delete_records: ${e.message}`, 500);

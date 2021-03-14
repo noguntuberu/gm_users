@@ -10,9 +10,10 @@ const {
     setup_request,
     process_response,
 } = require('../middlewares/http');
-const { authenticate_user } = require('../middlewares/auth');
+const { authenticate_api_key, authenticate_user } = require('../middlewares/auth');
 
 /** Route Handlers */
+const api_contact_route_handler = require('./api/contact');
 const contact_route_handler = require('./contact');
 const guest_route_handler = require('./guest');
 const mailing_list_route_handler = require('./mailing-list');
@@ -20,6 +21,7 @@ const tenant_route_handler = require('./tenant');
 
 /** Cross Origin Handling */
 router.use(setup_request);
+router.use('/api/contacts', authenticate_api_key, api_contact_route_handler);
 router.use('/guests', guest_route_handler);
 router.use('/contacts', authenticate_user, contact_route_handler);
 router.use('/mailing-lists', authenticate_user, mailing_list_route_handler);
