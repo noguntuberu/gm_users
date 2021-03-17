@@ -41,7 +41,7 @@ app.use(file_upload());
 app.use(morgan);
 
 /** Route Middleware */
-app.use('/api/users', route_handler);
+app.use('/', route_handler);
 
 /** */
 app.listen(APP_PORT, () => {
