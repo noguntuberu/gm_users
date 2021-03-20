@@ -62,6 +62,25 @@ class ContactService extends RootService {
             next(err);
         }
     }
+
+    async create_record_from_webform(request, next) {
+        try {
+            const { params, subscription_id, tenant_id, query } = request;
+            const result = await this.contact_controller.create_record({ ...params, ...query, tenant_id });
+
+            if (result && result.id && params.lists) {
+                this.add_contact_to_lists(tenant_id, result.id, params.lists);
+            }
+
+            return this.process_single_read(result, {
+                event_name: contact_events.created,
+                payload: { ...result, subscription_id },
+            });
+        } catch (e) {
+            const err = this.process_failed_response(`[ContactService] created_record: ${e.message}`, 500);
+            next(err);
+        }
+    }
 }
 
 module.exports = new ContactService(ContactController, MailingListController);

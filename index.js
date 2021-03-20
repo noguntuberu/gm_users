@@ -32,6 +32,7 @@ const { morgan } = require('./src/utilities/logger');
 const app = express();
 
 /** Middleware Applications */
+app.set('view engine', 'ejs');
 app.use(cors());
 app.use(compression());
 app.use(helmet());

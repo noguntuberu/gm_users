@@ -29,6 +29,27 @@ const authenticate_api_key = async (request, response, next) => {
         next()
     } catch (e) {
         logger.error(`[Auth Error] ${e.message}`);
+        next(process_error('Unauthorized', 403));
+    }
+}
+
+const authenticate_param_api_key = async (request, response, next) => {
+    try {
+        const { api_key } = request.params;
+        if (!api_key) {
+            return next(process_error(`Unauthorized`, 403));
+        }
+
+        const { error, payload } = (await axios.get(`${GM_ACCESS}/verify/${api_key}`)).data;
+        if (error) {
+            return next(process_error(`Unauthorized`, 403));
+        }
+
+        request.tenant_id = payload.org_id;
+        next()
+    } catch (e) {
+        logger.error(`[Auth Error] ${e.message}`);
+        next(process_error('Unauthorized', 403));
     }
 }
 
@@ -66,4 +87,4 @@ const authenticate_user = async (request, response, next) => {
     }
 }
 
-module.exports = { authenticate_api_key, authenticate_user };
+module.exports = { authenticate_api_key, authenticate_param_api_key, authenticate_user };
