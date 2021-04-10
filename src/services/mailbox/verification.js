@@ -20,11 +20,15 @@ class MailboxVerificationService extends RootService {
             const { email } = body;
 
             const code = Math.ceil(Math.random() * 100000);
-            const read_response = await this.mailbox_controller.read_records({ tenant_id });
+            const read_response = (await this.mailbox_controller.read_records({ tenant_id }))[0];
 
             let response;
             if (read_response.id) {
-                response = await this.mailbox_controller.update_records({ id, tenant_id }, { ...read_response, code });
+                console.log('updating');
+                response = await this.mailbox_controller.update_records({ id: read_response.id, tenant_id }, {
+                    ...this.delete_record_metadata(read_response),
+                    code,
+                });
                 await send_email(email, code, 'mailbox');
                 return this.process_successful_response({ ...read_response, ...response });
             }
@@ -47,7 +51,8 @@ class MailboxVerificationService extends RootService {
             const read_response = await this.mailbox_controller.read_records({ tenant_id });
             const { code: retreived_code } = read_response[0];
 
-            if (!retreived_code || code !== retreived_code) return this.process_failed_response('Invalid code', 400);
+            console.log({ code, retreived_code });
+            if (!retreived_code || code != retreived_code) return this.process_failed_response('Invalid code', 400);
 
             await this.mailbox_controller.update_records({ id, tenant_id }, {
                 $addToSet: { emails: { $each: [email] } },
