@@ -16,6 +16,7 @@ const { authenticate_user } = require('../middlewares/auth');
 const api_contact_route_handler = require('./api/contact');
 const contact_route_handler = require('./contact');
 const guest_route_handler = require('./guest');
+const mailbox_route_handler = require('./mailbox');
 const mailing_list_route_handler = require('./mailing-list');
 const tenant_route_handler = require('./tenant');
 
@@ -24,6 +25,7 @@ router.use(setup_request);
 router.use('/api/contacts', api_contact_route_handler);
 router.use('/guests', guest_route_handler);
 router.use('/contacts', authenticate_user, contact_route_handler);
+router.use('/mailboxes', authenticate_user, mailbox_route_handler);
 router.use('/mailing-lists', authenticate_user, mailing_list_route_handler);
 router.use('/tenants', authenticate_user, tenant_route_handler);
 

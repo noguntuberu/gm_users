@@ -17,7 +17,7 @@ const {
     validate_password
 } = require('./general-helper');
 
-const { send_email } = require('./email-helper');
+const { send_email } = require('../_email');
 
 class GuestService extends _RootService {
     constructor(
