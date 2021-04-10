@@ -40,6 +40,14 @@ const configure_message = (recipient, value, type) => {
                     <p><a href=${APP_CLIENT_URI}/activation/${value}>Activate Account</a></p>
                 `;
             break;
+        case 'mailbox':
+            subject = `GoMailer: Email Verification`;
+            html = `
+                <p> Here's you verification code.<p>
+                <br/>
+                <h2>${value}</h2>
+            `;
+            break;
         case 'otp':
             subject = `GoMailer OTP`;
             html = `
@@ -53,10 +61,10 @@ const configure_message = (recipient, value, type) => {
         case 'recovery':
             subject = `GoMailer: Account Recovery`;
             html = `
-                        <p> Kindly click the link to recover your account.<p>
-                        <br/>
-                        <p><a href=${APP_CLIENT_URI}/password/reset/${value}>Recover Account</a></p>
-                    `;
+                            <p> Kindly click the link to recover your account.<p>
+                            <br/>
+                            <p><a href=${APP_CLIENT_URI}/password/reset/${value}>Recover Account</a></p>
+                        `;
             break;
         default:
             throw new Error(`MAILING ERROR: incorrect message type: ${type}`);

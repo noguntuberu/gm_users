@@ -3,8 +3,7 @@
 **/
 //
 const RootService = require('../_root');
-const MailboxController = require('../../controllers/mailing-list');
-const MailboxModel = require('../../models/mailing-list');
+const MailboxController = require('../../controllers/mailbox');
 
 const {
     build_query,
