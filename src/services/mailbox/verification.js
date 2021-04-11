@@ -24,7 +24,6 @@ class MailboxVerificationService extends RootService {
 
             let response;
             if (read_response.id) {
-                console.log('updating');
                 response = await this.mailbox_controller.update_records({ id: read_response.id, tenant_id }, {
                     ...this.delete_record_metadata(read_response),
                     code,
