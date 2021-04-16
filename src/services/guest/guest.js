@@ -17,6 +17,7 @@ const {
     validate_password
 } = require('./general-helper');
 
+const { create_demo_subscription } = require('../../clients/resource');
 const { send_email } = require('../_email');
 
 class GuestService extends _RootService {
@@ -41,7 +42,14 @@ class GuestService extends _RootService {
 
             const user_updation = await this.tenant_controller.update_records({ _id: key }, { is_active: true });
             const { ok, nModified } = user_updation;
-            if (user_updation && ok && nModified) return this.process_successful_response(`Account Activation successful.`);
+            if (user_updation && ok && nModified) {
+                this.tenant_controller.read_records({ _id: key }).then( record => {
+                    if (!record[0]) return;
+                    create_demo_subscription(record[0].id);
+                }).catch(f => f);
+                return this.process_successful_response(`Account Activation successful.`);
+            }
+
             if (user_updation && ok && !nModified) return this.process_successful_response(`Account is already activated.`, 210);
             return this.process_failed_response(`Update failed`, 500);
         } catch (e) {

@@ -13,6 +13,29 @@ const process_error = (message, code = 410) => {
     }
 }
 
+const create_demo_subscription = async (tenant_id) => {
+    try {
+        let data = {
+            amount: 9.99,
+            expires_on: Date.now() + (86400000 * 30),
+            name: "Adventurer",
+            resources_allowed: {
+                contacts: 1000,
+                emails: 10000,
+            },
+            tenant_id,
+        };
+
+        await axios.post(`${GM_SALES_URI}/subscriptions`, data, {
+            headers: {
+                authorization: `Bearer ${GM_TOKEN}`,
+            }
+        });
+    } catch (e) {
+        client_logger.error(`[Resource Client] create_demo_subscription: ${e.message}`);
+    }
+}
+
 const fetch_subscription_info = async (tenant_id, response) => {
     const resource_response = await axios.get(`${GM_SALES_URI}/subscriptions?tenant_id=${tenant_id}&sort_by=-created_on`, {
         headers: {
@@ -55,4 +78,4 @@ const update_subscription_info = async (subscription_id, data) => {
     }
 }
 
-module.exports = { process_error, fetch_subscription_info, update_subscription_info };
+module.exports = { create_demo_subscription, process_error, fetch_subscription_info, update_subscription_info };
