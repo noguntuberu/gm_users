@@ -13,20 +13,10 @@ const process_error = (message, code = 410) => {
     }
 }
 
-const create_demo_subscription = async (tenant_id) => {
+const create_wallet = async (tenant_id) => {
     try {
-        let data = {
-            amount: 9.99,
-            expires_on: Date.now() + (86400000 * 30),
-            name: "Adventurer",
-            resources_allowed: {
-                contacts: 1000,
-                emails: 10000,
-            },
-            tenant_id,
-        };
-
-        await axios.post(`${GM_SALES_URI}/subscriptions`, data, {
+        let data = { tenant_id };
+        await axios.post(`${GM_SALES_URI}/wallets`, data, {
             headers: {
                 authorization: `Bearer ${GM_TOKEN}`,
             }
@@ -78,4 +68,4 @@ const update_subscription_info = async (subscription_id, data) => {
     }
 }
 
-module.exports = { create_demo_subscription, process_error, fetch_subscription_info, update_subscription_info };
+module.exports = { create_wallet, process_error, fetch_subscription_info, update_subscription_info };

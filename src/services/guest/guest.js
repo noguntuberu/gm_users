@@ -8,6 +8,7 @@ const OtpController = require('../../controllers/otp');
 const TenantController = require('../../controllers/tenant');
 const MailingListModel = require('../../models/mailing-list');
 const { ListContactSchema } = require('../../schemas/mailing-list');
+const { CREATED } = require('../../events/constants/tenant');
 
 const { AccountRecoverySchema, LogInSchema, SignUpSchema } = require('../../schemas/guest');
 const {
@@ -43,7 +44,7 @@ class GuestService extends _RootService {
             const user_updation = await this.tenant_controller.update_records({ _id: key }, { is_active: true });
             const { ok, nModified } = user_updation;
             if (user_updation && ok && nModified) {
-                this.tenant_controller.read_records({ _id: key }).then( record => {
+                this.tenant_controller.read_records({ _id: key }).then(record => {
                     if (!record[0]) return;
                     create_demo_subscription(record[0].id);
                 }).catch(f => f);
@@ -97,6 +98,10 @@ class GuestService extends _RootService {
             }
 
             await send_email(validated_email, _id, 'activation');
+            this.process_single_read(created_record, {
+                event_name: CREATED,
+                payload: created_record
+            });
             return this.process_successful_response(`Account created succesfully. Activation link sent to ${validated_email}`);
         } catch (e) {
             const err = this.process_failed_response(`[GuestService] create_record: ${e.message}`, 500);
