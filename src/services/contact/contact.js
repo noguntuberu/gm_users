@@ -25,7 +25,7 @@ class ContactService extends RootService {
 
     async create_record(request, next) {
         try {
-            const { body, subscription_id, tenant_id } = request;
+            const { body, tenant_id } = request;
             const { error } = SingleContactSchema.validate(body);
 
             if (error) throw new Error(error);
@@ -34,7 +34,7 @@ class ContactService extends RootService {
             const result = await this.contact_controller.create_record({ ...body, tenant_id });
             return this.process_single_read(result, {
                 event_name: contact_events.created,
-                payload: { ...result, subscription_id },
+                payload: { ...result },
             });
         } catch (e) {
             const err = this.process_failed_response(`[ContactService] created_record: ${e.message}`, 500);
@@ -44,7 +44,7 @@ class ContactService extends RootService {
 
     async create_records_from_file(request, response, next) {
         try {
-            const { files, body, subscription_id } = request;
+            const { files, body } = request;
             const limits = {
                 size: 5 * 1024 * 1024,
                 type: ['text/csv'],
@@ -61,7 +61,7 @@ class ContactService extends RootService {
             if (!limits.type.includes(mimetype)) return this.process_failed_response(`Invalid file type`);
 
             const file_stream = new FileReader(data);
-            const contact_upload_stream = new ContactCreator(this.contact_controller, subscription_id, tenant_id);
+            const contact_upload_stream = new ContactCreator(this.contact_controller, tenant_id);
 
             if (list_id) {
                 const list_update_stream = new MailingListStream(this.mailing_list_controller, list_id);
